@@ -42,7 +42,8 @@ def test_header(my_page):
     # Close the browser
     my_page.close_browser()
 
-def test_login(my_page):
+# Перевіряємо що є можливість залогіниться на сайт та вийти користувачу з сайту
+def test_login_and_logout(my_page):
     my_page.open_page(url)
     my_page.login_page()
     my_page.logout_page()
@@ -51,5 +52,5 @@ def test_login(my_page):
 
 if __name__ == "__main__":
     my_page = TestPage()
-    test_login(my_page)
+    test_login_and_logout(my_page)
 
