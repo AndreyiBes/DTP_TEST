@@ -46,8 +46,14 @@ class TestPage:
             user_menu_badges = self.page.get_by_label("dropdown-profile")
             # Iterate over user menu badges and handle based on text content
             assert user_menu_badges.is_visible(), f"{user_menu_badges}"
+        except Exception as e:
+            print(f"Error during login: {e}")
 
-
+    def logout_page(self):
+        try:
+            self.page.locator('.UserProfileMenustyle__UserProfileMenuDropdown-sc-r0spk5-0').click()
+            self.page.locator('.UserProfileMenustyle__UserProfileMenuDropdown-sc-r0spk5-0').click()
+            self.page.locator('.UserProfileAuthenticatedstyle__UserMenuExitButton-sc-1gnz1c0-0').click()
         except Exception as e:
             print(f"Error during login: {e}")
 

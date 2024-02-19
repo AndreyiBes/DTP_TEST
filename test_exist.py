@@ -45,7 +45,9 @@ def test_header(my_page):
 def test_login(my_page):
     my_page.open_page(url)
     my_page.login_page()
+    my_page.logout_page()
     my_page.close_browser()
+
 
 if __name__ == "__main__":
     my_page = TestPage()
