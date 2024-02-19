@@ -1,8 +1,11 @@
+from EXIST_TEST.objectexist import TestPage
+
 url = 'https://exist.ua'
 title = 'Автозапчастини EXIST.UA: Запчастини до авто онлайн!'
 search_field = "div.HeaderMiddlestyle__HeaderButtonsWrapper-sc-bi2b2x-6.sfRjK > div.HeaderSearchstyle__HeaderSearchBlock-sc-att33u-0.hinRrM > button > div > div.HeaderSearchstyle__HeaderSearchPlaceholder-sc-att33u-2.yMCVq"
 footer_locator = ".Footerstyle__FooterWrapper-sc-sqw8j4-0.eCPxDk"
 header_locator = ".Headerstyle__HeaderContainer-sc-4fgvrl-0"
+
 # Перевіряємо що заголовок сторінки завантажився
 def test_title(my_page):
     # Open the target page
@@ -39,5 +42,12 @@ def test_header(my_page):
     # Close the browser
     my_page.close_browser()
 
+def test_login(my_page):
+    my_page.open_page(url)
+    my_page.login_page()
+    my_page.close_browser()
+
 if __name__ == "__main__":
-    test_title()
+    my_page = TestPage()
+    test_login(my_page)
+
