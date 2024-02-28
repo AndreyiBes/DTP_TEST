@@ -1,4 +1,5 @@
-from EXIST_TEST.objectexist import TestPage
+from EXIST_TEST.conftest import my_page
+
 
 url = 'https://exist.ua'
 title = 'Автозапчастини EXIST.UA: Запчастини до авто онлайн!'
@@ -6,39 +7,16 @@ search_field = "div.HeaderMiddlestyle__HeaderButtonsWrapper-sc-bi2b2x-6.sfRjK > 
 footer_locator = ".Footerstyle__FooterWrapper-sc-sqw8j4-0.eCPxDk"
 header_locator = ".Headerstyle__HeaderContainer-sc-4fgvrl-0"
 
-# Перевіряємо що заголовок сторінки завантажився
-def test_title(my_page):
+def test_main_elements(my_page):
     # Open the target page
     my_page.open_page(url)
-    # Assert the title
+    # Перевіряємо що заголовок сторінки завантажився
     my_page.assert_title(title)
-    # Close the browser
-    my_page.close_browser()
-
-# Перевіряємо що поле пошуку завантажилось
-def test_search_field(my_page):
-    # Open the target page
-    my_page.open_page(url)
-    # Assert the search field
+    # Перевіряємо що поле пошуку завантажилось
     expected_search_field_locator = search_field
     my_page.assert_search_field(expected_search_field_locator)
-    # Close the browser
-    my_page.close_browser()
-
-# Перевіряємо що Футер сторінки завантажився
-def test_footer(my_page):
-    # Open the target page
-    my_page.open_page(url)
-    # Assert the visibility of the footer wrapper
+    # Перевіряємо що Футер сторінки завантажився
     my_page.assert_element_visible(footer_locator, "Footer Wrapper")
-    # Close the browser
-    my_page.close_browser()
-
-def test_header(my_page):
-    # Open the target page
-    my_page.open_page(url)
-    # Assert the visibility of the footer wrapper
-    my_page.assert_element_visible(header_locator, "Footer Wrapper")
     # Close the browser
     my_page.close_browser()
 
@@ -51,6 +29,6 @@ def test_login_and_logout(my_page):
 
 
 if __name__ == "__main__":
-    my_page = TestPage()
+    test_main_elements(my_page)
     test_login_and_logout(my_page)
 
