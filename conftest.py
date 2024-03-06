@@ -1,19 +1,19 @@
 import pytest
 from playwright.sync_api import sync_playwright
-from objectexist import TestPage
 
-@pytest.fixture(scope="session")
-def browser():
+from EXIST_TEST.oop_dtp import TestPage
+
+# Сторінка яку тестуємо
+url = 'https://dtp.com.ua'
+
+# Відкриваємо браузер, переходимо на потрібну сторінку
+@pytest.fixture
+def test_page(request, headless=False, slow_mo=200):
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False, slow_mo=200)
-
-        yield browser
+        browser = p.chromium.launch(headless=headless, slow_mo=slow_mo)
+        page = browser.new_page()
+        page.goto(url)
+        page.pause()
+        yield TestPage(page)
         browser.close()
 
-@pytest.fixture
-def my_page(browser):
-    page = browser.new_page()
-    page.pause()
-    # page.pause()
-    my_page_instance = TestPage(page)
-    yield my_page_instance
