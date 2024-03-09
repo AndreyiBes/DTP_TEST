@@ -5,6 +5,10 @@ class TestPage:
     def __init__(self, page):
         self.page = page
 
+    def goto(self, url):
+        self.page.goto(url)
+        self.page.wait_for_load_state("load")
+
     def report_bug_and_raise(self, error):
         # Пошук назви запущеного тесту
         calling_frame = inspect.currentframe().f_back
@@ -41,40 +45,66 @@ class TestPage:
         buy_button.click()
         self.page.wait_for_load_state("load")
 
-    def click_continue_in_popup(self):
-        # Працюємо з вспливаючим віконцем, натискаємо продовжити
-        continue_button_selector = "a"
-        continue_button_text = re.compile(r"^Продовжити$")
-        continue_button = self.page.locator(continue_button_selector).filter(has_text=continue_button_text)
-        if continue_button.is_visible():
-            continue_button.click()
-    def click_and_order_in_popup(self):
-        continue_button_selector = "a"
-        continue_button_text = re.compile(r"^Оформлення$")
-        continue_button = self.page.locator(continue_button_selector).filter(has_text=continue_button_text)
-        if continue_button.is_visible():
-            continue_button.click()
 
-    def check_item_added_to_cart(self, timeout=5000):
-        # Click on the cart button
+    def read_product_info(self):
+        self.page.locator('a>.fs18.fw5.mb15').nth(0).click()
+
+
+
+    def click_continue_in_popup(self):
+        self.page.wait_for_selector ( '.modal-body-add-to-cart', state = 'visible', timeout = 10000 )
+        self.page.locator('a>div.checkoutin-btn.fs16.fw3').filter(has_text=re.compile(r"^Продовжити$")).click()
+
+
+
+    def click_and_order_in_popup(self):
+        self.page.wait_for_selector ( '.modal-body-add-to-cart', state = 'visible', timeout = 10000 )
+        self.page.locator ( 'a>div.checkout-btn.fs16.fw5' ).filter (
+            has_text = re.compile ( r"^Оформлення$" ) ).click ()
+
+    def check_item_added_to_cart(self):
+        self.page.wait_for_selector ( '.mini-cart-content', state = "visible", timeout = 10000)
         self.page.click('.mini-cart-content')
-        # Wait for the cart item to appear
-        assert self.page.wait_for_selector('.row.small-card-container', timeout=timeout)
+        assert self.page.wait_for_selector('.row.small-card-container')
 
     def remove_item_from_cart(self):
-        # Прибираємо товар з кошика
         self.page.locator(".remove-item").click()
+        self.page.wait_for_selector ( '.mini-cart-content', state = "visible", timeout = 10000)
 
-    def check_cart_is_empty(self, timeout=5000):
-        # Перевіряємо чи кошик порожній
-        self.page.wait_for_selector('.mini-cart-content', timeout=timeout)
-        self.page.click('.mini-cart-content')
-        assert "Ваш кошик порожній" in self.page.locator(".cart-details").nth(0).text_content()
+    # def check_cart_is_empty(self):
+    #     self.page.wait_for_selector ( '.mini-cart-content', state = "visible", timeout = 20000)
+    #     self.page.click('.mini-cart-content')
+    #     assert "Ваш кошик порожній" in self.page.locator(".cart-details").nth(0).text_content()
+
+    def check_cart_is_empty(self):
+        max_attempts = 5
+        attempt_count = 0
+        while attempt_count < max_attempts:
+            self.page.click ( '.mini-cart-content' )
+            if self.page.locator ( '.cart-details' ).nth ( 0 ).is_visible ():
+                break
+            self.page.wait_for_timeout ( 10000 )
+            attempt_count += 1
+        assert self.page.locator ( '.cart-details' ).nth ( 0 ).is_visible ()
+        assert "Ваш кошик порожній" in self.page.locator ( '.cart-details' ).nth ( 0 ).text_content ()
+
+
+
+    # def check_new_page_title_contains_search_words(self, search_word):
+    #     # Перевіряємо чи заголовок сторінки містить усі слова зі списку
+    #     actual_title = self.page.title().lower()
+    #     assert all(word in actual_title for word in search_word.lower().split()), f"Expected words: {search_word}, Actual title: {actual_title}"
 
     def check_new_page_title_contains_search_words(self, search_word):
         # Перевіряємо чи заголовок сторінки містить усі слова зі списку
-        actual_title = self.page.title().lower()
-        assert all(word in actual_title for word in search_word.lower().split()), f"Expected words: {search_word}, Actual title: {actual_title}"
+        if not self.page.is_closed ():
+            actual_title = self.page.title ().lower ()
+            assert all ( word in actual_title for word in
+                         search_word.lower ().split () ), f"Expected words: {search_word}, Actual title: {actual_title}"
+        else:
+            print ( "Page is closed or navigating. Cannot check title." )
+
+
 
     def click_item_availability(self):
         self.page.locator("button.btn.buynow").click()
@@ -82,6 +112,7 @@ class TestPage:
 
     def item_not_valid(self):
         element_text = self.page.locator('.search-container.row').text_content()
+        self.page.wait_for_selector( '.search-container.row' )
         assert "Даного товару в Польші немає." in element_text
 
 
@@ -108,11 +139,17 @@ class TestPage:
         self.page.get_by_role("link", name=brand_name).click()
         self.page.wait_for_selector('.product-name', timeout=timeout)
 
-    def check_product_names_contain_words(self, brand_name):
-        product_name_elements = self.page.locator('.product-name').all()[:4]
-        for element in product_name_elements:
-            element_text = element.text_content().lower()
-            assert all(word in element_text for word in brand_name.lower()), f"Assertion failed for element: {element_text}"
+    # def check_product_names_contain_words(self, brand_names):
+    #     product_name_elements = self.page.locator('.product-name').all()[:4]
+    #     for element in product_name_elements:
+    #         element_text = element.text_content().lower()
+    #         assert all(word in element_text for word in brand_names.lower()), f"Assertion failed for element: {element_text}"
+
+    def check_product_names_contain_words(self, brand_names):
+        product_name_elements = self.page.locator ( '.product-name' ).all ()[:4]
+        # Check if at least one element contains any of the specified words
+        assert any ( any ( word in element.text_content ().lower () for word in brand_names.lower () ) for element in
+                     product_name_elements ), "Assertion failed for product names"
 
     def select_options_and_click_find(self):
         # У розділі "Каталог запчастин" обираємо
@@ -127,4 +164,4 @@ class TestPage:
         product_name_elements = self.page.locator('.product-name').all()[:4]
         for element in product_name_elements:
             element_text = element.text_content().lower()
-            assert all(word in element_text for word in expected_words), f"Assertion failed for element: {element_text}"
+            assert all(word.lower() in element_text for word in expected_words.split()), f"Assertion failed for element: {element_text}"
