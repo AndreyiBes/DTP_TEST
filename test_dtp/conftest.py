@@ -1,6 +1,6 @@
 import pytest
 from playwright.sync_api import sync_playwright
-from oop_dtp import TestPage
+from pageobject.oop_dtp import TestPage
 
 url = 'https://dtp.com.ua'
 
@@ -31,7 +31,7 @@ def test_page(request, browsers=None, headless=False, slow_mo=3000):
             context = browser.new_context(record_video_dir=f'./videos/{browser_type}/')
             page = context.new_page()
             page.goto(url)
-            # page.pause()
+            page.pause()
             yield TestPage(page)
             context.close()
             browser.close()
